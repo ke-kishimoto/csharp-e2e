@@ -28,6 +28,15 @@ namespace DotNet.Template
 
         }
 
+        [Step("要素 <selector> が <count> 件表示されている")]
+        public async Task ElementCountIsVisible(string selector, int count)
+        {
+            var elements = Page.Locator(selector);
+            await elements.First.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            var actualCount = await elements.CountAsync();
+            actualCount.ShouldBe(count);
+        }
+
         [Step("見出し <text> が表示されている")]
         public async Task HeadingIsVisible(string text)
         {
