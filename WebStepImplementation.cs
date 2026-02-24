@@ -50,6 +50,20 @@ namespace DotNet.Template
             actualCount.ShouldBe(count);
         }
 
+        [Step("要素 <selector> に <text> と入力する")]
+        public async Task EnterText(string selector, string text)
+        {
+            var element = Page.Locator(selector);
+            await element.FillAsync(text);
+        }
+
+        [Step("要素 <selector> をクリックする")]
+        public async Task ClickElement(string selector)
+        {
+            var element = Page.Locator(selector);
+            await element.ClickAsync();
+        }
+
         [Step("リンク <text> をクリックする")]
         public async Task ClickLink(string text)
         {

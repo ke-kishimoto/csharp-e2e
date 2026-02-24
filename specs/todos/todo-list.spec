@@ -1,4 +1,4 @@
-# TODO一覧
+# Todo list
 
 ## 一覧が表示されている
 * URL "/todos" を開く
