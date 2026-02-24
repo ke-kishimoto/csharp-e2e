@@ -17,3 +17,6 @@ reports
 # C# binary folders
 bin
 obj
+
+# Local environment overrides (not tracked by git)
+env/local

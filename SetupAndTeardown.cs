@@ -15,9 +15,30 @@ namespace DotNet.Template
         [BeforeScenario]
         public async Task Setup()
         {
-           var pw = await Playwright.CreateAsync();
-            var browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = false });
-            var ctx = await browser.NewContextAsync();
+            var config = PlaywrightConfig.Load();
+            var pw = await Playwright.CreateAsync();
+
+            var browserType = config.Browser.ToLowerInvariant() switch
+            {
+                "firefox" => pw.Firefox,
+                "webkit"  => pw.Webkit,
+                _         => pw.Chromium,
+            };
+
+            var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = config.Headless,
+                SlowMo   = config.SlowMo,
+            });
+
+            var ctxOptions = new BrowserNewContextOptions
+            {
+                ViewportSize = new ViewportSize { Width = config.ViewportWidth, Height = config.ViewportHeight },
+            };
+            if (config.BaseUrl != null)
+                ctxOptions.BaseURL = config.BaseUrl;
+
+            var ctx = await browser.NewContextAsync(ctxOptions);
             var page = await ctx.NewPageAsync();
 
             ScenarioDataStore.Add(KeyPlaywright, pw);
