@@ -11,6 +11,7 @@ namespace DotNet.Template
         private const string KeyBrowser = "pw:browser";
         private const string KeyPlaywright = "pw:playwright";
         private const string KeyContext = "pw:context";
+        private const string KeyBaseUrl = "pw:base_url";
 
         [BeforeScenario]
         public async Task Setup()
@@ -45,6 +46,9 @@ namespace DotNet.Template
             ScenarioDataStore.Add(KeyBrowser, browser);
             ScenarioDataStore.Add(KeyContext, ctx);
             ScenarioDataStore.Add(KeyPage, page);
+            if (config.BaseUrl != null) {
+                ScenarioDataStore.Add(KeyBaseUrl, config.BaseUrl);
+            }
         }
 
         [AfterScenario]
