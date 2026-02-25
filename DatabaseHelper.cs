@@ -76,6 +76,14 @@ namespace DotNet.Template
         }
 
         /// <summary>
+        /// 指定の DataTable を対象テーブルに一括挿入します。
+        /// </summary>
+        /// <param name="tableName">挿入先テーブル名</param>
+        /// <param name="dataTable">挿入するデータ</param>
+        public static Task InsertDataTableAsync(string tableName, DataTable dataTable) =>
+            BulkInsertAsync(tableName, dataTable);
+
+        /// <summary>
         /// 指定テーブルの全データを削除します。
         /// テストデータの初期化に使用します。
         /// </summary>

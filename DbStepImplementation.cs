@@ -4,6 +4,7 @@ using Gauge.CSharp.Lib.Attribute;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace DotNet.Template
 {
@@ -13,20 +14,51 @@ namespace DotNet.Template
     /// </summary>
     public class DbStepImplementation
     {
-        [Step("テーブル <table> のデータを全て削除する")]
-        public void DeleteAllDataFromTable(string table)
+        [Step("テーブル <tableName> のデータを全て削除する")]
+        public void DeleteAllDataFromTable(string tableName)
         {
-            DatabaseHelper.TruncateTableAsync(table).GetAwaiter().GetResult();
+            DatabaseHelper.TruncateTableAsync(tableName).GetAwaiter().GetResult();
         }
 
-        [Step("CSVファイル <csvPath> の内容をテーブル <table> に投入する")]
-        public void InsertDataFromCsvToTable(string csvPath, string table)
+        [Step("CSVファイル <csvPath> の内容をテーブル <tableName> に投入する")]
+        public void InsertDataFromCsvToTable(string csvPath, string tableName)
         {
-            DatabaseHelper.InsertFromCsvAsync(tableName: table, relativePath: csvPath).GetAwaiter().GetResult();
+            DatabaseHelper.InsertFromCsvAsync(tableName: tableName, relativePath: csvPath).GetAwaiter().GetResult();
         }
 
-        [Step("テーブル <table> の内容が <csv> と一致している")]
-        public void TableContentIsCsv(string table, Table csv)
+        [Step("テーブル <tableName> に以下の内容を投入する <table>")]
+        public void InsertDataFromTableToTable(string tableName, Table table)
+        {
+            InsertDataFromCsvToTable(tableName, table);
+        }
+
+        [Step("テーブル <tableName> に <csv> の内容を投入する")]
+        public void InsertDataFromCsvToTable(string tableName, Table csv)
+        {
+            var rows = csv.GetTableRows();
+            if (rows.Count == 0) return;
+
+            var columns = csv.GetColumnNames();
+            var dataTable = new DataTable();
+            foreach (var column in columns)
+                dataTable.Columns.Add(column);
+
+            foreach (var row in rows)
+            {
+                var dataRow = dataTable.NewRow();
+                foreach (var column in columns)
+                {
+                    var value = row.GetCell(column);
+                    dataRow[column] = string.IsNullOrEmpty(value) ? DBNull.Value : value;
+                }
+                dataTable.Rows.Add(dataRow);
+            }
+
+            DatabaseHelper.InsertDataTableAsync(tableName, dataTable).GetAwaiter().GetResult();
+        }
+
+        [Step("テーブル <tableName> の内容が <csv> と一致している")]
+        public void TableContentIsCsv(string tableName, Table csv)
         {
             var expectedRows = csv.GetTableRows();
             if (expectedRows.Count == 0) return;
@@ -37,12 +69,12 @@ namespace DotNet.Template
             var orderByCol = columns.Count > 0 ? columns[0] : null;
 
             var actualRows = DatabaseHelper
-                .QueryTableRowsAsync(table, orderByCol)
+                .QueryTableRowsAsync(tableName, orderByCol)
                 .GetAwaiter().GetResult();
 
             // 行数チェック
             actualRows.Count.ShouldBe(expectedRows.Count,
-                $"テーブル '{table}' の行数が一致しません。期待値: {expectedRows.Count} 件、実際: {actualRows.Count} 件");
+                $"テーブル '{tableName}' の行数が一致しません。期待値: {expectedRows.Count} 件、実際: {actualRows.Count} 件");
 
             // 行ごとに、Gauge Table に存在する列だけ比較する
             for (var i = 0; i < expectedRows.Count; i++)
