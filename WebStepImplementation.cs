@@ -1,8 +1,10 @@
+#nullable enable
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 using Microsoft.Playwright;
 using Shouldly;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DotNet.Template
@@ -79,6 +81,54 @@ namespace DotNet.Template
 
             var actual = await h1.InnerTextAsync();
             actual.ShouldContain(text);
+        }
+
+        [Step("テーブル要素 <selector> の内容が <csv> と一致している")]
+        public async Task TableContentIs(string selector, Table csv)
+        {
+            var tableLocator = Page.Locator(selector);
+            await tableLocator.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            // ── HTMLテーブルのヘッダー取得 ──────────────────────────────
+            var headerCells = tableLocator.Locator("thead th, tr:first-child th");
+            var headerCount  = await headerCells.CountAsync();
+            var htmlHeaders  = new List<string>();
+            for (var i = 0; i < headerCount; i++)
+                htmlHeaders.Add((await headerCells.Nth(i).InnerTextAsync()).Trim());
+
+            // ── 期待値 (Gauge Table) の取得 ────────────────────────────
+            var expectedRows = csv.GetTableRows();
+
+            // ── HTMLテーブルのデータ行取得 ─────────────────────────────
+            var bodyRows     = tableLocator.Locator("tbody tr");
+            var actualCount  = await bodyRows.CountAsync();
+
+            actualCount.ShouldBe(expectedRows.Count,
+                $"テーブルの行数が一致しません。期待値: {expectedRows.Count} 件、実際: {actualCount} 件");
+
+            // ── 行ごとにセル値を比較 ──────────────────────────────────
+            for (var rowIndex = 0; rowIndex < expectedRows.Count; rowIndex++)
+            {
+                var expectedRow = expectedRows[rowIndex];
+                var cells       = bodyRows.Nth(rowIndex).Locator("td");
+
+                foreach (var header in htmlHeaders)
+                {
+                    // Gauge Table に存在しない列はスキップ
+                    string expectedValue;
+                    
+                    try { expectedValue = expectedRow.GetCell(header); }
+                    catch { continue; }
+
+                    if (expectedValue == "") continue;
+
+                    var colIndex    = htmlHeaders.IndexOf(header);
+                    var actualValue = (await cells.Nth(colIndex).InnerTextAsync()).Trim();
+
+                    actualValue.ShouldBe(expectedValue.Trim(),
+                        $"行 {rowIndex + 1}、列 '{header}' の値が一致しません");
+                }
+            }
         }
     }
 
