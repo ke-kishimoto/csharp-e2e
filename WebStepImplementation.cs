@@ -83,6 +83,34 @@ namespace DotNet.Template
             actual.ShouldContain(text);
         }
 
+        [Step("テーブル要素 <selector> の <row> 行目の <column> 列の値が <value> である")]
+        public async Task TableCellValueIs(string selector, int row, string column, string value)
+        {
+            var tableLocator = Page.Locator(selector);
+            await tableLocator.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            var headerCells = tableLocator.Locator("thead th, tr:first-child th");
+            var headerCount = await headerCells.CountAsync();
+
+            int colIndex = -1;
+            for (int i = 0; i < headerCount; i++)
+            {
+                var headerText = (await headerCells.Nth(i).InnerTextAsync()).Trim();
+                if (headerText.Equals(column, StringComparison.OrdinalIgnoreCase))
+                {
+                    colIndex = i;
+                    break;
+                }
+            }
+
+            if (colIndex == -1)
+                throw new InvalidOperationException($"列 '{column}' が見つかりません。");
+
+            var cellLocator = tableLocator.Locator($"tbody tr:nth-child({row}) td:nth-child({colIndex + 1})");
+            var actualValue = (await cellLocator.InnerTextAsync()).Trim();
+            actualValue.ShouldBe(value);
+        }
+
         [Step("テーブル要素 <selector> の内容が <csv> と一致している")]
         public async Task TableContentIs(string selector, Table csv)
         {
