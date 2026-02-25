@@ -1,4 +1,6 @@
 # Todo list
+* テーブル "todos" のデータを全て削除する
+* CSVファイル "testdata/csv/todos.csv" の内容をテーブル "todos" に投入する
 
 ## 一覧が表示されている
 * URL "/todos" を開く
