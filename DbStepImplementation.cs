@@ -26,13 +26,8 @@ namespace DotNet.Template
             DatabaseHelper.InsertFromCsvAsync(tableName: tableName, relativePath: csvPath).GetAwaiter().GetResult();
         }
 
-        [Step("テーブル <tableName> に以下の内容を投入する <table>")]
-        public void InsertDataFromTableToTable(string tableName, Table table)
-        {
-            InsertDataFromCsvToTable(tableName, table);
-        }
 
-        [Step("テーブル <tableName> に <csv> の内容を投入する")]
+        [Step("テーブル <tableName> に <csv> の内容を投入する", "テーブル <tableName> に以下の内容を投入する <csv>")]
         public void InsertDataFromCsvToTable(string tableName, Table csv)
         {
             var rows = csv.GetTableRows();
@@ -57,7 +52,7 @@ namespace DotNet.Template
             DatabaseHelper.InsertDataTableAsync(tableName, dataTable).GetAwaiter().GetResult();
         }
 
-        [Step("テーブル <tableName> の内容が <csv> と一致している")]
+        [Step("テーブル <tableName> の内容が <csv> と一致している", "テーブル <tableName> の内容が以下の通りである <table>")]
         public void TableContentIsCsv(string tableName, Table csv)
         {
             var expectedRows = csv.GetTableRows();
@@ -92,12 +87,6 @@ namespace DotNet.Template
                         $"行 {i + 1}、列 '{col}' の値が一致しません");
                 }
             }
-        }
-
-        [Step("テーブル <tableName> の内容が以下の通りである <table>")]
-        public void TableContentIs(string tableName, Table expectedTable)
-        {
-            TableContentIsCsv(tableName, expectedTable);
         }
 
         [Step("テーブル <tableName> の条件 <condition> のレコードの内容が以下の通りである <table>")]
