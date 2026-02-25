@@ -20,6 +20,12 @@ namespace DotNet.Template
             DatabaseHelper.TruncateTableAsync(tableName).GetAwaiter().GetResult();
         }
 
+        [Step("SQL <sql> を実行する")]
+        public void ExecuteSql(string sql)
+        {
+            DatabaseHelper.ExecuteSqlAsync(sql).GetAwaiter().GetResult();
+        }
+
         [Step("CSVファイル <csvPath> の内容をテーブル <tableName> に投入する")]
         public void InsertDataFromCsvToTable(string csvPath, string tableName)
         {
