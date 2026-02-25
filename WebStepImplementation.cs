@@ -111,8 +111,14 @@ namespace DotNet.Template
             actualValue.ShouldBe(value);
         }
 
+        [Step("テーブル要素 <selector> の内容が以下の通りである <table>")]
+        public async Task TableContentIs(string selector, Table table)
+        {
+            await TableContentIsCsv(selector, table);
+        }
+
         [Step("テーブル要素 <selector> の内容が <csv> と一致している")]
-        public async Task TableContentIs(string selector, Table csv)
+        public async Task TableContentIsCsv(string selector, Table csv)
         {
             var tableLocator = Page.Locator(selector);
             await tableLocator.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });

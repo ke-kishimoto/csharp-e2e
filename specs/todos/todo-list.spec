@@ -8,7 +8,19 @@
 * 要素 "tbody tr" が "3" 件表示されている
 * テーブル要素 "table" の内容が <table:expected/todo/todo-list.csv> と一致している
 
-## 一覧が表示されている TableVer
+## 一覧が表示されている TableVer1
+* URL "/todos" を開く
+* 要素 "h1" に "Todos" が表示されている
+* 要素 "tbody tr" が "3" 件表示されている
+* テーブル要素 "table" の内容が以下の通りである
+|row|ID|Title       |Done |Created           |
+|---|--|------------|-----|------------------|
+|1  |3 |Third Todo  |False|2024/06/04 8:00:00|
+|2  |2 |Another Todo|True |2024/06/03 6:00:00|
+|3  |1 |Sample Todo |False|2024/06/02 4:00:00|
+
+
+## 一覧が表示されている TableVer2
 
 |row|ID|Title       |Done |Created           |
 |---|--|------------|-----|------------------|
