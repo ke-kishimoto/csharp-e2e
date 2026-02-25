@@ -167,6 +167,42 @@ namespace DotNet.Template
             return result;
         }
 
+        /// <summary>
+        /// WHERE 句を指定してテーブルからデータを取得します。
+        /// </summary>
+        /// <param name="tableName">クエリ対象のテーブル名</param>
+        /// <param name="condition">WHERE 句の条件式 (例: "Id = 1" または "Status = 'Active'")</param>
+        /// <returns>取得した行のリスト。各行は列名→値の辞書</returns>
+        public static async Task<List<Dictionary<string, string>>> QueryWithConditionAsync(
+            string tableName, string condition)
+        {
+            var config   = DbConfig.Load();
+            var safeName = EscapeTableName(tableName);
+            var result   = new List<Dictionary<string, string>>();
+
+            await using var conn = new SqlConnection(config.ConnectionString);
+            await conn.OpenAsync();
+
+            // condition はステップ定義者が記述する文字列のため、そのまま埋め込む
+            // （テストコードでのみ使用し、外部入力は渡さないことを前提とする）
+            var query = $"SELECT * FROM {safeName} WHERE {condition};";
+            await using var cmd = new SqlCommand(query, conn)
+            {
+                CommandTimeout = config.CommandTimeout
+            };
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (var i = 0; i < reader.FieldCount; i++)
+                    row[reader.GetName(i)] = reader[i]?.ToString() ?? string.Empty;
+                result.Add(row);
+            }
+
+            return result;
+        }
+
         // -------------------------------------------------------------------
 
         private static DataTable ReadCsvToDataTable(string fullPath)

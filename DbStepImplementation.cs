@@ -2,6 +2,7 @@
 using Gauge.CSharp.Lib;
 using Gauge.CSharp.Lib.Attribute;
 using Shouldly;
+using System;
 using System.Collections.Generic;
 
 namespace DotNet.Template
@@ -25,7 +26,7 @@ namespace DotNet.Template
         }
 
         [Step("テーブル <table> の内容が <csv> と一致している")]
-        public void TableContentIs(string table, Table csv)
+        public void TableContentIsCsv(string table, Table csv)
         {
             var expectedRows = csv.GetTableRows();
             if (expectedRows.Count == 0) return;
@@ -58,6 +59,51 @@ namespace DotNet.Template
                     actualValue.ShouldBe(expectedValue,
                         $"行 {i + 1}、列 '{col}' の値が一致しません");
                 }
+            }
+        }
+
+        [Step("テーブル <tableName> の内容が以下の通りである <table>")]
+        public void TableContentIs(string tableName, Table expectedTable)
+        {
+            TableContentIsCsv(tableName, expectedTable);
+        }
+
+        [Step("テーブル <tableName> の条件 <condition> のレコードの内容が以下の通りである <table>")]
+        public void TableContentIs(string tableName, string condition, Table expectedTable)
+        {
+            // 列名は "Column" と "Value" のみ許容
+            var columnNames = expectedTable.GetColumnNames();
+            if (columnNames.Count != 2
+                || !columnNames.Contains("Column")
+                || !columnNames.Contains("Value"))
+            {
+                throw new ArgumentException(
+                    $"期待値テーブルの列名は \"Column\" と \"Value\" のみ許容されますが、実際の列名: [{string.Join(", ", columnNames)}] です。");
+            }
+
+            // 条件付きでデータ取得
+            var rows = DatabaseHelper
+                .QueryWithConditionAsync(tableName, condition)
+                .GetAwaiter().GetResult();
+
+            // 1 レコードのみであることを検証
+            rows.Count.ShouldBe(1,
+                $"テーブル '{tableName}' の条件 '{condition}' に該当するレコードが {rows.Count} 件です。、1 件であることが期待されます。");
+
+            var actualRow     = rows[0];
+            var expectedRows  = expectedTable.GetTableRows();
+
+            // Gauge Table の各行 (Column / Value) で検証
+            foreach (var expectedRow in expectedRows)
+            {
+                var col           = expectedRow.GetCell("Column").Trim();
+                var expectedValue = expectedRow.GetCell("Value").Trim();
+
+                if (!actualRow.TryGetValue(col, out var rawActual))
+                    throw new ArgumentException(
+                        $"テーブル '{tableName}' に列 '{col}' は存在しません。");
+
+                rawActual.Trim().ShouldBe(expectedValue, $"列 '{col}' の値が一致しません");
             }
         }
     }
