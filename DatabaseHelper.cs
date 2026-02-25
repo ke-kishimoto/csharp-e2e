@@ -87,6 +87,86 @@ namespace DotNet.Template
             await ExecuteSqlAsync($"TRUNCATE TABLE {safeName};");
         }
 
+        /// <summary>
+        /// 指定テーブルの全データを取得します。
+        /// 主キー列を1列目と仮定し、Dictionary&lt;string, Dictionary&lt;string, string&gt;&gt; の形式で返します。
+        /// 例: { "1" => { "Title" => "Sample Todo", "Done" => "false" }, ... }
+        /// </summary>
+        /// <param name="tableName">クエリ対象のテーブル名</param>
+        /// <returns>テーブルデータの辞書</returns>
+        /// 主キー列が複数ある場合や、1列目が主キーでない場合は適宜修正してください。
+        public static async Task<Dictionary<string, Dictionary<string, string>>> QueryTableAsync(string tableName)
+        {
+            var config = DbConfig.Load();
+            var safeName = EscapeTableName(tableName);
+            var result = new Dictionary<string, Dictionary<string, string>>();
+
+            await using var conn = new SqlConnection(config.ConnectionString);
+            await conn.OpenAsync();
+
+            var query = $"SELECT * FROM {safeName};";
+            await using var cmd = new SqlCommand(query, conn)
+            {
+                CommandTimeout = config.CommandTimeout
+            };
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var key = reader[0].ToString() ?? throw new Exception("主キー列の値が null です");
+                var rowDict = new Dictionary<string, string>();
+                for (var i = 1; i < reader.FieldCount; i++)
+                {
+                    var columnName = reader.GetName(i);
+                    var value = reader[i]?.ToString() ?? "";
+                    rowDict[columnName] = value;
+                }
+                result[key] = rowDict;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 指定テーブルの全データを取得し、行のリストとして返します。
+        /// 各行は「列名 → 値(文字列)」の辞書です。
+        /// </summary>
+        /// <param name="tableName">クエリ対象のテーブル名</param>
+        /// <param name="orderByColumn">
+        /// ORDER BY に使う列名。null の場合は ORDER BY なし。
+        /// Gauge Table の最初の列名を渡すと決定的な順序になります。
+        /// </param>
+        public static async Task<List<Dictionary<string, string>>> QueryTableRowsAsync(
+            string tableName, string? orderByColumn = null)
+        {
+            var config   = DbConfig.Load();
+            var safeName = EscapeTableName(tableName);
+            var result   = new List<Dictionary<string, string>>();
+
+            await using var conn = new SqlConnection(config.ConnectionString);
+            await conn.OpenAsync();
+
+            var orderBy = orderByColumn != null
+                ? $" ORDER BY [{orderByColumn.Trim('[', ']')}]"
+                : string.Empty;
+
+            await using var cmd = new SqlCommand($"SELECT * FROM {safeName}{orderBy};", conn)
+            {
+                CommandTimeout = config.CommandTimeout
+            };
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (var i = 0; i < reader.FieldCount; i++)
+                    row[reader.GetName(i)] = reader[i]?.ToString() ?? string.Empty;
+                result.Add(row);
+            }
+
+            return result;
+        }
+
         // -------------------------------------------------------------------
 
         private static DataTable ReadCsvToDataTable(string fullPath)
