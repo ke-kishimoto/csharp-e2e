@@ -11,15 +11,18 @@
 ## 一覧が表示されている InlineTable
 * テーブル "todos" のデータを全て削除する
 * テーブル "todos" に以下の内容を投入する
+
 |Id|Title|Done|CreatedAt|
 |--|-----|----|---------|
 |1 |Sample Todo|false|2024-06-01T10:00:00Z|
 |2 |Another Todo|true|2024-06-02T12:00:00Z|
 |3 |Third Todo|false|2024-06-03T14:00:00Z|
+
 * URL "/todos" を開く
 * 要素 "h1" に "Todos" が表示されている
 * 要素 "tbody tr" が "3" 件表示されている
 * テーブル要素 "table" の内容が以下の通りである
+
 |row|ID|Title       |Done |Created           |
 |---|--|------------|-----|------------------|
 |1  |3 |Third Todo  |False|2024/06/04 8:00:00|

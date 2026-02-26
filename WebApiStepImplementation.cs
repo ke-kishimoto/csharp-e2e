@@ -48,5 +48,20 @@ namespace DotNet.Template
             var doc = JsonDocument.Parse(content);
             doc.RootElement.GetArrayLength().ShouldBe(int.Parse(length));
         }
+
+        [Step("レスポンスのJSONが <json> と一致している")]
+        public void JsonShouldMatch(string json)
+        {
+            var response = ScenarioDataStore.Get<RestResponse>(KeyResponse)
+                ?? throw new InvalidOperationException("レスポンスが存在しません。先にリクエストを送信してください。");
+
+            var content = response.Content
+                ?? throw new InvalidOperationException("レスポンスボディが空です。");
+
+            var expectedDoc = JsonDocument.Parse(json);
+            var actualDoc = JsonDocument.Parse(content);
+
+            actualDoc.RootElement.ShouldBe(expectedDoc.RootElement);
+        }
     }
 }

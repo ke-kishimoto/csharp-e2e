@@ -16,6 +16,7 @@
 * URL "/Todos" に遷移している
 * 要素 "tbody tr" が "1" 件表示されている
 * テーブル "todos" の内容が以下の通りである
+
 |Id|Title|Done|
 |--|-----|----|
 |1 |New Todo|False|
@@ -26,6 +27,7 @@
 * 要素 "button[type='submit']" をクリックする
 * URL "/Todos" に遷移している
 * テーブル "todos" の条件 "Id = 1" のレコードの内容が以下の通りである
+
 |Column|Value   |
 |------|--------|
 |Id    |1       |
