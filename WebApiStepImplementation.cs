@@ -61,7 +61,11 @@ namespace DotNet.Template
             var expectedDoc = JsonDocument.Parse(json);
             var actualDoc = JsonDocument.Parse(content);
 
-            actualDoc.RootElement.ShouldBe(expectedDoc.RootElement);
+            var options = new JsonSerializerOptions { WriteIndented = false };
+            var normalizedExpected = JsonSerializer.Serialize(expectedDoc.RootElement, options);
+            var normalizedActual = JsonSerializer.Serialize(actualDoc.RootElement, options);
+
+            normalizedActual.ShouldBe(normalizedExpected);
         }
     }
 }
