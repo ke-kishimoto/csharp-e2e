@@ -139,5 +139,19 @@ namespace DotNet.Template
         {
             DatabaseHelper.ExecuteStoredProcedureAsync(procName).GetAwaiter().GetResult();
         }
+
+        [Step("ストアドプロシージャ <procName> を以下の引数で実行する <paramTable>")]
+        public void ExecuteStoredProcedureWithParams(string procName, Table paramTable)
+        {
+            var parameters = new Dictionary<string, object?>();
+            foreach (var row in paramTable.GetTableRows())
+            {
+                var paramName  = row.GetCell("Parameter").Trim();
+                var paramValue = row.GetCell("Value").Trim();
+                parameters[paramName] = string.IsNullOrEmpty(paramValue) ? null : paramValue;
+            }
+
+            DatabaseHelper.ExecuteStoredProcedureAsync(procName, parameters).GetAwaiter().GetResult();
+        }
     }
 }

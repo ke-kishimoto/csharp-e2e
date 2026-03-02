@@ -231,6 +231,31 @@ namespace DotNet.Template
             await cmd.ExecuteNonQueryAsync();
         }
 
+        /// <summary>
+        /// パラメータ付きのストアドプロシージャを実行します。
+        /// </summary>
+        /// <param name="procName">実行するストアドプロシージャの名前</param>
+        /// <param name="parameters">ストアドプロシージャに渡すパラメータの辞書 (例: { "UserId" => 123, "IsActive" => true })</param>
+        public static async Task ExecuteStoredProcedureAsync(string procName, Dictionary<string, object?> parameters)
+        {
+            var config = DbConfig.Load();
+            var safeName = EscapeTableName(procName);
+
+            await using var conn = new SqlConnection(config.ConnectionString);
+            await conn.OpenAsync();
+
+            await using var cmd = new SqlCommand(safeName, conn)
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = config.CommandTimeout
+            };
+
+            foreach (var param in parameters)
+                cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+
         // -------------------------------------------------------------------
 
         private static DataTable ReadCsvToDataTable(string fullPath)
