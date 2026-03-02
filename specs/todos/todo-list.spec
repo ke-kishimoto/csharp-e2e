@@ -2,11 +2,11 @@
 
 ## 一覧が表示されている CsvPath
 * テーブル "todos" のデータを全て削除する
-* テーブル "todos" に <table:testdata/csv/todos.csv> の内容を投入する
+* テーブル "todos" に <table:fixtures/todos/seed/csv/todos.csv> の内容を投入する
 * URL "/todos" を開く
 * 要素 "h1" に "Todos" が表示されている
 * 要素 "tbody tr" が "3" 件表示されている
-* テーブル要素 "table" の内容が <table:expected/todo/todo-list.csv> と一致している
+* テーブル要素 "table" の内容が <table:fixtures/todos/expected/csv/todo-list.csv> と一致している
 
 ## 一覧が表示されている InlineTable
 * テーブル "todos" のデータを全て削除する
@@ -41,7 +41,7 @@
 |3  |1 |Sample Todo |False|2024/06/02 4:00:00|
 
 * テーブル "todos" のデータを全て削除する
-* CSVファイル "testdata/csv/todos.csv" の内容をテーブル "todos" に投入する
+* CSVファイル "fixtures/todos/seed/csv/todos.csv" の内容をテーブル "todos" に投入する
 * URL "/todos" を開く
 * 要素 "h1" に "Todos" が表示されている
 * 要素 "tbody tr" が "3" 件表示されている

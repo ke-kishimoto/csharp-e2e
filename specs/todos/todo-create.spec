@@ -7,7 +7,7 @@
 * 要素 "button[type='submit']" をクリックする
 * URL "/Todos" に遷移している
 * 要素 "tbody tr" が "1" 件表示されている
-* テーブル "todos" の内容が <table:expected/todo/db/todo-create.csv> と一致している
+* テーブル "todos" の内容が <table:fixtures/todos/expected/csv/todo-created.csv> と一致している
 
 ## Todoが作成できる Table確認ver1
 * URL "/Todos/Create" を開く
