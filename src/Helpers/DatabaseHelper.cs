@@ -9,8 +9,9 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DotNet.Template.Config;
 
-namespace DotNet.Template
+namespace DotNet.Template.Helpers
 {
     /// <summary>
     /// DB テストデータ管理ユーティリティ。

@@ -6,8 +6,9 @@ using Shouldly;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNet.Template.Config;
 
-namespace DotNet.Template
+namespace DotNet.Template.Steps
 {
     public class WebApiStepImplementation
     {

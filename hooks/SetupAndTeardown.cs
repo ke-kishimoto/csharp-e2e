@@ -2,8 +2,9 @@ using Gauge.CSharp.Lib.Attribute;
 using Gauge.CSharp.Lib;
 using Microsoft.Playwright;
 using System.Threading.Tasks;
+using DotNet.Template.Config;
 
-namespace DotNet.Template
+namespace DotNet.Template.Hooks
 {
     public class SetupAndTeardown 
     {

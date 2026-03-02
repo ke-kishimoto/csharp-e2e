@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DotNet.Template
+namespace DotNet.Template.Config
 {
     /// <summary>
     /// DB 接続設定を env/default/db.properties から読み込みます。

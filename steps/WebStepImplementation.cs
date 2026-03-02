@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DotNet.Template
+namespace DotNet.Template.Steps
 {
     public class WebStepImplementation
     {

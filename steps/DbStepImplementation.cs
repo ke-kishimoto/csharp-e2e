@@ -5,8 +5,9 @@ using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using DotNet.Template.Helpers;
 
-namespace DotNet.Template
+namespace DotNet.Template.Steps
 {
     /// <summary>
     /// Gauge のステップ実装クラス。

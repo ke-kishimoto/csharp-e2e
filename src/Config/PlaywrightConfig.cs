@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace DotNet.Template
+namespace DotNet.Template.Config
 {
     /// <summary>
     /// Playwright 設定を env/default/web.properties から読み込みます。
