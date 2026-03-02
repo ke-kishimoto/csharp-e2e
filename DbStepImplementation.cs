@@ -133,5 +133,11 @@ namespace DotNet.Template
                 rawActual.Trim().ShouldBe(expectedValue, $"列 '{col}' の値が一致しません");
             }
         }
+
+        [Step("ストアドプロシージャ <procName> を実行する")]
+        public void ExecuteStoredProcedure(string procName)
+        {
+            DatabaseHelper.ExecuteStoredProcedureAsync(procName).GetAwaiter().GetResult();
+        }
     }
 }

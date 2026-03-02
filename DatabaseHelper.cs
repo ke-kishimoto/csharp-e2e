@@ -211,6 +211,26 @@ namespace DotNet.Template
             return result;
         }
 
+        /// <summary>
+        /// 引数なしのストアドプロシージャを実行します。
+        /// </summary>
+        /// <param name="procName">実行するストアドプロシージャの名前</param>
+        public static async Task ExecuteStoredProcedureAsync(string procName)
+        {
+            var config = DbConfig.Load();
+            var safeName = EscapeTableName(procName);
+
+            await using var conn = new SqlConnection(config.ConnectionString);
+            await conn.OpenAsync();
+
+            await using var cmd = new SqlCommand(safeName, conn)
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = config.CommandTimeout
+            };
+            await cmd.ExecuteNonQueryAsync();
+        }
+
         // -------------------------------------------------------------------
 
         private static DataTable ReadCsvToDataTable(string fullPath)
